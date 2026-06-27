@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LewGen Solutions - Protezoid™</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
+    select { font-family: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== VARIABLES ===== */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --accent: #d4a574;
+      --accent-hover: #c49a6c;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: #334155;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+    .navbar.scrolled {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .navbar-inner {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 20px; font-weight: 700; }
+    .logo-part1 { color: var(--text-primary); }
+    .logo-part2 { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-link {
+      position: relative;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    .mobile-toggle { display: none; color: var(--text-primary); background: none; border: none; padding: 4px; }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 64px; left: 0; right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 18px;
+      padding: 8px 0;
+    }
+    .mobile-menu a:hover { color: var(--text-primary); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: block; }
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #1e3a5f 0%, #0f172a 70%);
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(45,74,111,0.4) 0%, transparent 60%);
+      animation: heroPulse 20s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes heroPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      max-width: 800px;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.6s ease-out 0.1s forwards;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero h1 .white { color: var(--text-primary); }
+    .hero-subtitle {
+      margin-top: 16px;
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.6s ease-out 0.3s forwards;
+    }
+    .hero-buttons {
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.6s ease-out 0.5s forwards;
+    }
+    .btn-primary {
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: scale(1.02); }
+    .btn-secondary {
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--accent);
+      font-weight: 600;
+      border-radius: 8px;
+      font-size: 16px;
+      border: 1px solid var(--accent);
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: rgba(212, 165, 116, 0.1); }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== FEATURES ===== */
+    .features {
+      background: var(--bg-primary);
+      padding: 80px 24px;
+    }
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .feature-card.visible { opacity: 1; transform: translateY(0); }
+    .feature-icon {
+      width: 48px; height: 48px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: rgba(212, 165, 116, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .feature-icon svg { width: 24px; height: 24px; color: var(--accent); }
+    .feature-card h3 {
+      margin-top: 16px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .feature-card p {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    @media (max-width: 1024px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .features-grid { grid-template-columns: 1fr; } }
+
+    /* ===== CONFIGURATOR ===== */
+    .configurator {
+      background: var(--bg-secondary);
+      padding: 80px 24px;
+    }
+    .configurator-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .configurator-grid.visible { opacity: 1; transform: translateY(0); }
+    .config-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .config-panel h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+    .config-section { margin-bottom: 24px; }
+    .config-section:last-child { margin-bottom: 0; }
+    .config-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    /* Radio options */
+    .radio-option {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: var(--bg-tertiary);
+      margin-bottom: 8px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+    .radio-option:hover { background: #3d4f6a; }
+    .radio-option.active {
+      border-color: var(--accent);
+      background: rgba(212, 165, 116, 0.08);
+    }
+    .radio-option input { display: none; }
+    .radio-circle {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .radio-option.active .radio-circle { border-color: var(--accent); }
+    .radio-circle-inner {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .radio-option.active .radio-circle-inner { opacity: 1; }
+    .radio-text .name { font-size: 14px; font-weight: 500; color: var(--text-primary); display: block; }
+    .radio-text .desc { font-size: 12px; color: var(--text-secondary); }
+
+    /* Select */
+    .config-select {
+      position: relative;
+    }
+    .config-select select {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 14px;
+      border-radius: 8px;
+      padding: 10px 36px 10px 14px;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+    }
+    .config-select select:focus { border-color: var(--accent); }
+    .config-select svg {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Checkbox options */
+    .checkbox-option {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: var(--bg-tertiary);
+      margin-bottom: 8px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+    .checkbox-option:hover { background: #3d4f6a; }
+    .checkbox-option.checked {
+      border-color: var(--accent);
+      background: rgba(212, 165, 116, 0.08);
+    }
+    .checkbox-option input { display: none; }
+    .checkbox-box {
+      width: 16px; height: 16px;
+      border-radius: 3px;
+      border: 1.5px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .checkbox-option.checked .checkbox-box {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .checkbox-box svg {
+      width: 11px; height: 11px;
+      color: #0f172a;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .checkbox-option.checked .checkbox-box svg { opacity: 1; }
+    .checkbox-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--text-primary); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .checkbox-price { font-size: 14px; color: var(--accent); font-weight: 500; flex-shrink: 0; }
+
+    .features-list-scroll { max-height: 320px; overflow-y: auto; padding-right: 4px; }
+    .features-list-scroll::-webkit-scrollbar { width: 4px; }
+    .features-list-scroll::-webkit-scrollbar-track { background: transparent; }
+    .features-list-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Center column - Product */
+    .product-image {
+      width: 100%;
+      max-width: 280px;
+      margin: 20px auto;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-label { font-size: 14px; color: var(--text-muted); }
+    .spec-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .center-title { text-align: center; }
+
+    /* Right column - Summary */
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+    .summary-row .label { font-size: 14px; color: var(--text-secondary); }
+    .summary-row .value { font-size: 14px; color: var(--text-primary); }
+    .summary-row .value-accent { font-size: 14px; color: var(--accent); font-weight: 500; }
+    .summary-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+    .summary-total { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+    .summary-total .label { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .summary-total .value { font-size: 24px; font-weight: 700; color: var(--accent); }
+    .summary-buttons { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .btn-full { width: 100%; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; text-align: center; }
+    .btn-accent { background: var(--accent); color: #0f172a; border: none; }
+    .btn-accent:hover { background: var(--accent-hover); }
+    .btn-outline { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .capabilities { margin-top: 24px; }
+    .capabilities h4 { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+    .capabilities ul { list-style: none; }
+    .capabilities li { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+    .capabilities li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    @media (max-width: 1024px) {
+      .configurator-grid { grid-template-columns: 1fr; }
+      .config-panel { max-width: 600px; margin: 0 auto; width: 100%; }
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .footer-logo { font-size: 20px; font-weight: 700; }
+    .footer-copyright { margin-top: 12px; font-size: 14px; color: var(--text-secondary); }
+    .footer-tagline { margin-top: 8px; font-size: 12px; color: var(--text-muted); max-width: 500px; margin-left: auto; margin-right: auto; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#home" class="logo">
+        <span class="logo-part1">LewGen</span>
+        <span class="logo-part2">Solutions</span>
+      </a>
+      <div class="nav-links">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#products" class="nav-link">Products</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <svg id="menuIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="closeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#home" onclick="closeMenu()">Home</a>
+      <a href="#products" onclick="closeMenu()">Products</a>
+      <a href="#about" onclick="closeMenu()">About</a>
+      <a href="#contact" onclick="closeMenu()">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1><span class="accent">Protezoid&trade;</span><span class="white">: The Protector</span></h1>
+      <p class="hero-subtitle">Advanced Robotics for Modern Security</p>
+      <div class="hero-buttons">
+        <a href="#products" class="btn-primary">Configure Protezoid&trade;</a>
+        <a href="#contact" class="btn-secondary">Schedule Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" id="about">
+    <div class="features-grid">
+      <div class="feature-card" data-animate>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Enhanced Safety</h3>
+        <p>Reduce officer injuries by up to 50% by deploying robots for high-risk tasks and dangerous situations.</p>
+      </div>
+      <div class="feature-card" data-animate>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>24/7 Operations</h3>
+        <p>Continuous surveillance and task execution without fatigue, ensuring constant facility monitoring.</p>
+      </div>
+      <div class="feature-card" data-animate>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3>Cost Efficiency</h3>
+        <p>Achieve 20-30% operational cost savings through automation and optimized resource allocation.</p>
+      </div>
+      <div class="feature-card" data-animate>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3>Smart Integration</h3>
+        <p>Seamlessly integrate with existing security systems and facility management protocols.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONFIGURATOR ===== -->
+  <section class="configurator" id="products">
+    <div class="configurator-grid" data-animate>
+
+      <!-- Column 1: Configuration Options -->
+      <div class="config-panel">
+        <h3>Configuration Options</h3>
+
+        <!-- Security Level -->
+        <div class="config-section">
+          <label class="config-label">Security Level</label>
+          <div id="securityLevels"></div>
+        </div>
+
+        <!-- Primary Task -->
+        <div class="config-section">
+          <label class="config-label">Primary Task</label>
+          <div class="config-select">
+            <select id="primaryTask">
+              <option>Security Patrol</option>
+              <option>Facility Inspection</option>
+              <option>Emergency Response</option>
+              <option>Maintenance Support</option>
+            </select>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- Environment -->
+        <div class="config-section">
+          <label class="config-label">Environment</label>
+          <div class="config-select">
+            <select id="environment">
+              <option>Indoor Only</option>
+              <option>Outdoor Only</option>
+              <option>Mixed Indoor/Outdoor</option>
+            </select>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- Special Features -->
+        <div class="config-section">
+          <label class="config-label">Special Features</label>
+          <div class="features-list-scroll" id="specialFeatures"></div>
+        </div>
+      </div>
+
+      <!-- Column 2: Protezoid Configuration -->
+      <div class="config-panel">
+        <h3 class="center-title">Protezoid&trade; Configuration</h3>
+        <img src="protezoid-robot.jpg" alt="Protezoid™ Security Robot" class="product-image" />
+        <div class="spec-row"><span class="spec-label">Height:</span><span class="spec-value">6.2 ft</span></div>
+        <div class="spec-row"><span class="spec-label">Weight:</span><span class="spec-value">285 lbs</span></div>
+        <div class="spec-row"><span class="spec-label">Battery Life:</span><span class="spec-value">12 hours</span></div>
+        <div class="spec-row"><span class="spec-label">Max Speed:</span><span class="spec-value">3.5 mph</span></div>
+      </div>
+
+      <!-- Column 3: Configuration Summary -->
+      <div class="config-panel">
+        <h3>Configuration Summary</h3>
+        <div id="summaryContent"></div>
+        <div class="summary-buttons">
+          <button class="btn-full btn-accent">Request Quote</button>
+          <button class="btn-full btn-outline">Download Specs</button>
+        </div>
+        <div class="capabilities">
+          <h4>Key Capabilities</h4>
+          <ul>
+            <li>360&deg; surveillance cameras</li>
+            <li>Autonomous navigation</li>
+            <li>Two-way audio communication</li>
+            <li>Real-time threat detection</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="contact">
+    <div class="footer-logo">
+      <span class="logo-part1">LewGen</span>
+      <span class="logo-part2">Solutions</span>
+    </div>
+    <p class="footer-copyright">&copy; 2025 LewGen Solutions. All rights reserved.</p>
+    <p class="footer-tagline">Transforming correctional facilities through innovative robotics technology.</p>
+  </footer>
+
+  <script>
+    /* ===== DATA ===== */
+    const BASE_PRICE = 125000;
+    const SECURITY_LEVELS = [
+      { id: 'min', name: 'Minimum', desc: 'Basic surveillance and patrol', price: 0 },
+      { id: 'med', name: 'Medium', desc: 'Enhanced sensors and response', price: 25000 },
+      { id: 'max', name: 'Maximum', desc: 'Full tactical capabilities', price: 50000 }
+    ];
+    const SPECIAL_FEATURES = [
+      { id: 'facial', name: 'Facial Recognition', price: 15000 },
+      { id: 'nonlethal', name: 'Non-lethal Response', price: 25000 },
+      { id: 'advcomm', name: 'Advanced Communications', price: 10000 },
+      { id: 'routine', name: 'Routine Patrol Enhancement', price: 20000 },
+      { id: 'meals', name: 'Meal & Medication Delivery', price: 15000 },
+      { id: 'meddist', name: 'Medication Distribution System', price: 18000 },
+      { id: 'monitor', name: 'Advanced Monitoring & Surveillance', price: 25000 },
+      { id: 'data', name: 'Data Collection & Analysis', price: 22000 },
+      { id: 'biometric', name: 'Biometric Scanning', price: 30000 },
+      { id: 'emergency', name: 'Emergency Response System', price: 20000 }
+    ];
+
+    /* ===== STATE ===== */
+    let state = {
+      securityLevel: 'min',
+      selectedFeatures: new Set()
+    };
+
+    /* ===== NAVBAR SCROLL ===== */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ===== MOBILE MENU ===== */
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    let menuOpen = false;
+
+    mobileToggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('open', menuOpen);
+      menuIcon.style.display = menuOpen ? 'none' : 'block';
+      closeIcon.style.display = menuOpen ? 'block' : 'none';
+    });
+    function closeMenu() {
+      menuOpen = false;
+      mobileMenu.classList.remove('open');
+      menuIcon.style.display = 'block';
+      closeIcon.style.display = 'none';
+    }
+
+    /* ===== RENDER SECURITY LEVELS ===== */
+    const securityContainer = document.getElementById('securityLevels');
+    function renderSecurityLevels() {
+      securityContainer.innerHTML = SECURITY_LEVELS.map(level => `
+        <label class="radio-option ${state.securityLevel === level.id ? 'active' : ''}" data-id="${level.id}">
+          <input type="radio" name="security" value="${level.id}" ${state.securityLevel === level.id ? 'checked' : ''}>
+          <span class="radio-circle">
+            <span class="radio-circle-inner"></span>
+          </span>
+          <span class="radio-text">
+            <span class="name">${level.name}</span>
+            <span class="desc">${level.desc}</span>
+          </span>
+        </label>
+      `).join('');
+
+      securityContainer.querySelectorAll('.radio-option').forEach(el => {
+        el.addEventListener('click', () => {
+          state.securityLevel = el.dataset.id;
+          renderSecurityLevels();
+          updateSummary();
+        });
+      });
+    }
+    renderSecurityLevels();
+
+    /* ===== RENDER SPECIAL FEATURES ===== */
+    const featuresContainer = document.getElementById('specialFeatures');
+    function renderFeatures() {
+      featuresContainer.innerHTML = SPECIAL_FEATURES.map(feature => `
+        <label class="checkbox-option ${state.selectedFeatures.has(feature.id) ? 'checked' : ''}" data-id="${feature.id}">
+          <input type="checkbox" ${state.selectedFeatures.has(feature.id) ? 'checked' : ''}>
+          <span class="checkbox-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="checkbox-name" title="${feature.name}">${feature.name}</span>
+          <span class="checkbox-price">+$${feature.price.toLocaleString()}</span>
+        </label>
+      `).join('');
+
+      featuresContainer.querySelectorAll('.checkbox-option').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = el.dataset.id;
+          if (state.selectedFeatures.has(id)) {
+            state.selectedFeatures.delete(id);
+          } else {
+            state.selectedFeatures.add(id);
+          }
+          renderFeatures();
+          updateSummary();
+        });
+      });
+    }
+    renderFeatures();
+
+    /* ===== UPDATE SUMMARY ===== */
+    const summaryContent = document.getElementById('summaryContent');
+    function updateSummary() {
+      const secLevel = SECURITY_LEVELS.find(s => s.id === state.securityLevel);
+      const secUpcharge = secLevel.price;
+      let featuresHtml = '';
+      let featuresTotal = 0;
+
+      state.selectedFeatures.forEach(fid => {
+        const f = SPECIAL_FEATURES.find(sf => sf.id === fid);
+        if (f) {
+          featuresTotal += f.price;
+          featuresHtml += `
+            <div class="summary-row">
+              <span class="label">${f.name}</span>
+              <span class="value-accent">+$${f.price.toLocaleString()}</span>
+            </div>
+          `;
+        }
+      });
+
+      const total = BASE_PRICE + secUpcharge + featuresTotal;
+
+      summaryContent.innerHTML = `
+        <div class="summary-row">
+          <span class="label">Base Unit</span>
+          <span class="value">$${BASE_PRICE.toLocaleString()}</span>
+        </div>
+        ${secUpcharge > 0 ? `
+        <div class="summary-row">
+          <span class="label">Security Upgrade</span>
+          <span class="value-accent">+$${secUpcharge.toLocaleString()}</span>
+        </div>` : ''}
+        ${featuresHtml}
+        <hr class="summary-divider">
+        <div class="summary-total">
+          <span class="label">Total Investment</span>
+          <span class="value">$${total.toLocaleString()}</span>
+        </div>
+      `;
+    }
+    updateSummary();
+
+    /* ===== SCROLL ANIMATIONS ===== */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+    document.querySelectorAll('.feature-card').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 100}ms`;
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
